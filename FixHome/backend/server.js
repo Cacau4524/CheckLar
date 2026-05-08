@@ -1,53 +1,34 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('./db');
+const dotenv = require('dotenv');
+const db = require('./src/config/database');
+
+dotenv.config();
 
 const app = express();
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.static('../frontend'));
 
-app.get('/', (req, res) => {
-    res.send('Servidor funcionando');
+// Rotas
+app.use('/api/auth', require('./src/routes/auth'));
+app.use('/api/servicos', require('./src/routes/servicos'));
+app.use('/api/agendamentos', require('./src/routes/agendamentos'));
+
+// Teste conexão DB
+db.getConnection((err, connection) => {
+    if (err) {
+        console.error('Erro ao conectar com MySQL:', err);
+        return;
+    }
+    console.log('✅ MySQL conectado com sucesso!');
+    connection.release();
 });
 
-app.get('/servicos', (req, res) => {
-
-    const sql = 'SELECT * FROM servicos';
-
-    db.query(sql, (err, result) => {
-
-        if(err){
-            res.send(err);
-        } else {
-            res.json(result);
-        }
-
-    });
-
-});
-
-app.post('/usuarios', (req, res) => {
-
-    const { nome, email, senha } = req.body;
-
-    const sql = `
-        INSERT INTO usuarios(nome, email, senha)
-        VALUES (?, ?, ?)
-    `;
-
-    db.query(sql, [nome, email, senha], (err, result) => {
-
-        if(err){
-            res.send(err);
-        } else {
-            res.send('Usuário cadastrado');
-        }
-
-    });
-
-});
-
-app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
+// Iniciar servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro | FixHome</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Fix<span>Home</span></div>
+        <a href="../index.html" style="color: black; text-decoration: none; font-weight: 500;">Voltar</a>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Crie sua conta</h2>
+            <p style="color: #6b7280; margin-bottom: 20px;">Junte-se a milhares de clientes e profissionais.</p>
+            
+            <form id="registerForm">
+                <input type="text" id="regNome" placeholder="Nome Completo" required>
+                <input type="email" id="regEmail" placeholder="E-mail" required>
+                <input type="password" id="regSenha" placeholder="Senha segura" required>
+                
+                <select id="regTipo">
+                    <option value="cliente">Quero Contratar (Cliente)</option>
+                    <option value="prestador">Quero Trabalhar (Profissional)</option>
+                </select>
+
+                <!-- 🔧 CORREÇÃO: agora chama a função JS -->
+                <button type="button" onclick="cadastrar()" class="btn-primary">
+                    Finalizar Cadastro
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    async function cadastrar() {
+        const name = document.getElementById("regNome").value;
+        const email = document.getElementById("regEmail").value;
+        const password = document.getElementById("regSenha").value;
+
+        try {
+            const res = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("Cadastro criado com sucesso!");
+                window.location.href = "/html/index.html";
+            } else {
+                alert(data.message || "Cadastro incorreto");
+            }
+
+        } catch (error) {
+            alert("Cadastro incorreto");
+        }
+    }
+    </script>
+
+</body>
+</html>
